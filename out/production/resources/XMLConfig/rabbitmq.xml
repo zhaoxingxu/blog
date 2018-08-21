@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+    <!--配置connection-factory，指定连接rabbit server参数 -->
+    <rabbit:connection-factory id="rabbitConnectionFactory"
+                               host="${mq.host}"
+                               username="${mq.username}"
+                               password="${mq.password}"
+                               port="${mq.port}" requested-heartbeat="30"
+                               virtual-host="${mq.vhost}" channel-cache-size="50"/>
+
+    <!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->
+    <rabbit:admin id="rabbitAdmin" connection-factory="rabbitConnectionFactory"/>
+    <!--消费者配置-->
+    <bean id="rabbitListenerContainerFactory"
+          class="org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory">
+        <property name="connectionFactory" ref="rabbitConnectionFactory"/>
+        <property name="concurrentConsumers" value="10"/>
+        <property name="maxConcurrentConsumers" value="50"/>
+    </bean>
+    <!--消费者配置-结束-->
+    <rabbit:queue durable="true" auto-delete="false" exclusive="false" name="test.testqueue"/>
+
+    <!-- direct方式：根据routingKey将消息发送到所有绑定的queue中 -->
+    <rabbit:direct-exchange name="xzx">
+        <rabbit:bindings>
+
+            <rabbit:binding queue="test.testqueue" key="test.testqueue.binding" />
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+    <!--生产者配置-->
+    <!--retryTemplate为连接失败时的重发队列所用的templete-->
+    <bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
+        <property name="backOffPolicy">
+            <bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+                <property name="initialInterval" value="500" />
+                <property name="multiplier" value="10.0" />
+                <property name="maxInterval" value="10000" />
+            </bean>
+        </property>
+    </bean>
+    <rabbit:template id="rabbitTemplate"
+                     connection-factory="rabbitConnectionFactory" reply-timeout="2000" retry-template="retryTemplate"/>
+
+    <!--生产者配置-结束-->
+</beans>

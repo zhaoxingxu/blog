@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/jquery-3.2.1.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <title>${topic.title} - IOIOIOIO </title>
+</head>
+<body>
+<!-- 引入header文件 -->
+<div th:include="header"></div>
+<div style="width: 70%;margin:1% 2% 1% 5%;float: left;">
+    <div class="panel panel-default" id="main" style="">
+        <div class="panel-heading" style="background-color: white">
+            <div>
+                <div class="panel-heading" style="background-color: white">
+                    <a href="/">IOIOIOIOIO</a> › 主题
+                </div>
+                <h3 th:text="${topic.title}"></h3><br/>
+                <div>
+                    <a th:href="@{'/member/'+${topic.user.username}}"><span><strong
+                            th:text="${topic.user.username}"></strong></span></a>&nbsp;&nbsp;
+                    <small class="text-muted" th:text="${topic.localCreateTime}+'&nbsp;&nbsp;&nbsp;+08:00'"></small>&nbsp;&nbsp;
+                    <small class="text-muted" th:text="${topic.click}+'次点击'"></small>
+                </div>
+            </div>
+
+            <div style="float: right;margin-top: -100px">
+                <img width="50px" height="50px" th:src="${topic.user.avatar}" class="img-rounded">
+            </div>
+        </div>
+
+        <ul class="list-group" style="width: 100%">
+            <li class="list-group-item" th:text="${topic.content}">
+            </li>
+        </ul>
+    </div>
+     <div th:if="${replies}" class="panel panel-default" id="main" style="">
+            <div class="panel-heading" style="background-color: white">
+                <span th:each="reply:${replies}"  th:if="${status?.last}"  th:text="${fn:length(replies)}+' 回复 | 直到 '+${reply.localCreateTime}">
+                </span>
+            </div>
+
+            <ul class="list-group" style="width: 100%">
+                <!-- 遍历评论 -->
+                <li class="list-group-item" th:each="reply:${replies}">
+                    <div style="height: 50px">
+                        <div style="float: left;width: 6%;margin-bottom: 5px">
+                            <img width="50px" height="50px" th:src="${reply.user.avatar} " class="img-rounded">
+                        </div>
+                        <div style="width: 89%;float: left">
+                            <a th:href="@{'/member/'+${reply.user.username}}"><strong th:text="${reply.user.username}"></strong></a>&nbsp;&nbsp;
+                            <small class="text-muted" th:text="${reply.localCreateTime}"></small>
+                            <br/>
+                            <div>
+                                <p th:text="${reply.content}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div th:if="${user}" class="panel panel-default" id="main" style="">
+            <div class="panel-heading" style="background-color: white">
+                添加一条新回复
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <form action="/reply/add" method="post">
+                        <input type="hidden" name="topicId" th:value="${topic.id}">
+                        <input type="hidden" name="replyUserId" th:value="${user.id}">
+                        <textarea class="form-control" rows="3" name="content" required="required"></textarea><br/>
+                        <input type="submit" class="btn btn-default btn-sm" value="回复">
+                    </form>
+                </div>
+
+            </div>
+        </div>
+</div>
+<!-- 引入侧边栏文件 -->
+<div th:include="side"></div>
+<!-- 引入footer文件 -->
+<div th:include="footer"></div>
+</body>
+</html>
