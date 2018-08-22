@@ -7,7 +7,6 @@
     <mvc:default-servlet-handler/>
 
     <mvc:annotation-driven/>
-    <!--<mvc:resources mapping="/WEB-INF/jsp/**" location="/WEB-INF/jsp/"/>-->
 
     <context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="false"
                                   location="classpath*:properties/jdbc.properties,classpath*:properties/redis.properties,classpath*:properties/rabbitMQ.properties"  system-properties-mode="ENVIRONMENT"/>
@@ -26,6 +25,24 @@
             </set>
         </property>
     </bean>
+    <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!-- 指定所上传文件的总大小不能超过200KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+        <property name="maxUploadSize" value="2000000"/>
+    </bean>
+
+    <!-- SpringMVC在超出上传文件限制时，会抛出org.springframework.web.multipart.MaxUploadSizeExceededException -->
+    <!-- 该异常是SpringMVC在检查上传的文件信息时抛出来的，而且此时还没有进入到Controller方法中 -->
+    <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <!-- 遇到MaxUploadSizeExceededException异常时，自动跳转到ftl/common/error_fileupload.ftl页面 -->
+                <prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">/common/error_fileupload</prop>
+            </props>
+        </property>
+    </bean>
+
     <import resource="mybatis.xml"/>
     <import resource="rabbitmq.xml"/>
     <import resource="redis.xml"/>
@@ -39,12 +56,4 @@
 
     <!-- 配置基于注解的声明式事务 -->
     <tx:annotation-driven transaction-manager="transactionManager" />
-
-    <!--<bean id="templateResolver" class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">-->
-        <!--<property name="suffix" value=".jsp" />-->
-    <!--</bean>-->
-
-    <!--<bean id="templateEngine"   class="org.thymeleaf.spring5.SpringTemplateEngine">-->
-        <!--<property name="templateResolver" ref="templateResolver" />-->
-    <!--</bean>-->
 </beans>

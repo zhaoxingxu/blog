@@ -25,8 +25,8 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 war {
-    archiveName = ".war"
-}blog
+    archiveName = "blog.war"
+}
 
 repositories {
     mavenCentral()

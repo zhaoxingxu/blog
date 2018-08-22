@@ -7,7 +7,6 @@
     <mvc:default-servlet-handler/>
 
     <mvc:annotation-driven/>
-    <!--<mvc:resources mapping="/WEB-INF/jsp/**" location="/WEB-INF/jsp/"/>-->
 
     <context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="false"
                                   location="classpath*:properties/jdbc.properties,classpath*:properties/redis.properties,classpath*:properties/rabbitMQ.properties"  system-properties-mode="ENVIRONMENT"/>
@@ -43,6 +42,7 @@
             </props>
         </property>
     </bean>
+
     <import resource="mybatis.xml"/>
     <import resource="rabbitmq.xml"/>
     <import resource="redis.xml"/>

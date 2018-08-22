@@ -75,7 +75,7 @@ public class TopicController {
      * @return
      */
     @RequestMapping("/t/{id}")
-    public ModelAndView toTopic(@PathVariable("id")Integer id, HttpSession session){
+    public ModelAndView toTopic(@PathVariable("id")Integer id,HttpSession session){
         //点击量加一
         boolean ifSucc=topicService.clickAddOne(id);
         //获取主题信息
@@ -109,7 +109,7 @@ public class TopicController {
      * 渲染指定板块页面
      */
     @RequestMapping("/tab/{tabNameEn}")
-    public ModelAndView toTabPage(@PathVariable("tabNameEn")String tabNameEn, HttpSession session){
+    public ModelAndView toTabPage(@PathVariable("tabNameEn")String tabNameEn,HttpSession session){
         Tab tab=tabService.getByTabNameEn(tabNameEn);
         Integer tabId=tab.getId();
 
@@ -143,7 +143,7 @@ public class TopicController {
      * @return
      */
     @RequestMapping(value = "/topic/add", method = RequestMethod.POST)
-    public ModelAndView addTopic(HttpServletRequest request, HttpSession session){
+    public ModelAndView addTopic(HttpServletRequest request,HttpSession session){
         ModelAndView indexPage;
         //未登陆
         if(session.getAttribute("userId")==null){
@@ -172,8 +172,8 @@ public class TopicController {
             }
         }
         indexPage=new ModelAndView("redirect:/");
-
         return  indexPage;
     }
 
 }
+
